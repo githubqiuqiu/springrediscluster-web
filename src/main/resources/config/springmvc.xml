@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 扫描controller包下的注解 -->
+    <context:component-scan base-package="com.ht.controller" />
+
+    <!-- 会自动注册RequestMappingHandlerMapping与RequestMappingHandlerAdapter两个Bean  是spring MVC为@Controllers分发请求所必须的-->
+    <mvc:annotation-driven />
+
+    <!-- 通过这个类即可以注册自定义转换器，还可以注册自定义注解驱动逻辑。 -->
+    <bean class="org.springframework.format.support.FormattingConversionServiceFactoryBean"/>
+
+    <!-- 文件上传 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8" />
+        <property name="maxUploadSize" value="209715200" />
+        <property name="maxInMemorySize" value="40960" />
+    </bean>
+
+    <!-- 转json格式 -->
+    <bean id="mappingJacksonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <value>text/plain;charset=UTF-8</value>
+                <value>application/json;charset=UTF-8</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <ref bean="mappingJacksonHttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置试图渲染页面 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/views/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!-- 设置静态资源不被拦截 -->
+    <mvc:resources location="/static/" mapping="/static/**"/>
+
+</beans>
